@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Virtual Air Combat Engagement Simulator - Enregistrement Visiteurs</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- En-tête -->
+    <header>
+        <div class="container">
+            <h1>Virtual Air Combat Engagement Simulator</h1>
+            <p>Enregistrement des visiteurs - Salon</p>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="container">
+            <div class="tabs">
+                <button class="tab-button active" data-tab="registration">
+                    <span class="tab-icon">👤</span> Enregistrement
+                </button>
+                <button class="tab-button" data-tab="feedback">
+                    <span class="tab-icon">💬</span> Avis
+                </button>
+                <button class="tab-button" data-tab="data">
+                    <span class="tab-icon">📊</span> Données (<span id="visitor-count">0</span>)
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <main>
+        <div class="container">
+            <!-- Formulaire d'enregistrement -->
+            <div class="tab-content active" id="registration-tab">
+                <div class="card">
+                    <h2>Enregistrement du visiteur</h2>
+                    <form id="registration-form">
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="nom">Nom *</label>
+                                    <input type="text" id="nom" name="nom" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="prenom">Prénom *</label>
+                                    <input type="text" id="prenom" name="prenom" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="email">Email *</label>
+                                    <input type="email" id="email" name="email" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="secteur">Secteur</label>
+                                    <select id="secteur" name="secteur">
+                                        <option value="">Sélectionnez un secteur</option>
+                                        <option value="Défense">Défense</option>
+                                        <option value="Aviation civile">Aviation civile</option>
+                                        <option value="Formation">Formation</option>
+                                        <option value="Technologie">Technologie</option>
+                                        <option value="Recherche">Recherche</option>
+                                        <option value="Autre">Autre</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" id="save-visitor">Enregistrer le visiteur</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Formulaire d'avis -->
+            <div class="tab-content" id="feedback-tab" style="display: none;">
+                <div class="card">
+                    <h2>Recueillir l'avis du visiteur</h2>
+                    <form id="feedback-form">
+                        <div class="form-group">
+                            <label for="visitor-select">Sélectionner un visiteur</label>
+                            <select id="visitor-select" name="visitor-select" required>
+                                <option value="">Sélectionnez un visiteur</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="remarques">Remarques et commentaires</label>
+                            <textarea id="remarques" name="remarques" placeholder="Entrez vos remarques et suggestions ici..."></textarea>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="ergonomie">Ergonomie (0-5)</label>
+                                    <div class="rating-container">
+                                        <input type="range" id="ergonomie" name="ergonomie" min="0" max="5" value="3" step="1">
+                                        <span class="rating-value" id="ergonomie-value">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="simulation">Simulation (0-5)</label>
+                                    <div class="rating-container">
+                                        <input type="range" id="simulation" name="simulation" min="0" max="5" value="3" step="1">
+                                        <span class="rating-value" id="simulation-value">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label for="ressenti">Ressenti (0-5)</label>
+                                    <div class="rating-container">
+                                        <input type="range" id="ressenti" name="ressenti" min="0" max="5" value="3" step="1">
+                                        <span class="rating-value" id="ressenti-value">3</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" id="save-feedback">Enregistrer l'avis</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Données et exportation -->
+            <div class="tab-content" id="data-tab" style="display: none;">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <h2>Données enregistrées</h2>
+                        <button id="export-button" disabled>
+                            <span class="tab-icon">📥</span> Exporter en CSV
+                        </button>
+                    </div>
+                    <div id="data-table-container">
+                        <table id="visitors-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom / Prénom</th>
+                                    <th>Email</th>
+                                    <th>Secteur</th>
+                                    <th>Evaluation</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="visitors-table-body">
+                                <!-- Les données seront ajoutées via JavaScript -->
+                            </tbody>
+                        </table>
+                        <div id="empty-state" class="empty-state">
+                            Aucune donnée enregistrée pour le moment
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        <div class="container">
+            <p>Virtual Air Combat Engagement Simulator &copy; <span id="current-year"></span></p>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div id="notification" style="display: none;"></div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+</body>
+</html>
