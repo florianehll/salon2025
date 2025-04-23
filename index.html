@@ -3,15 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Virtual Air Combat Engagement Simulator - Enregistrement Visiteurs</title>
+    <title>ARESIA - Virtual Air Combat Engagement Simulator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- En-tête -->
     <header>
         <div class="container">
+            <div class="logo-container">
+                <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#003366;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#66b3ff;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M30 70 L40 30 L55 60 L75 20 L85 40 L70 70 Z" fill="url(#logoGradient)" />
+                    <text x="50" y="85" font-family="Montserrat" font-size="16" font-weight="bold" text-anchor="middle" fill="#003366">ARESIA</text>
+                </svg>
+            </div>
             <h1>Virtual Air Combat Engagement Simulator</h1>
-            <p>Enregistrement des visiteurs - Salon</p>
         </div>
     </header>
 
@@ -20,13 +32,13 @@
         <div class="container">
             <div class="tabs">
                 <button class="tab-button active" data-tab="registration">
-                    <span class="tab-icon">👤</span> Enregistrement
+                    <span>📝</span> Enregistrement
                 </button>
                 <button class="tab-button" data-tab="feedback">
-                    <span class="tab-icon">💬</span> Avis
+                    <span>💬</span> Avis
                 </button>
                 <button class="tab-button" data-tab="data">
-                    <span class="tab-icon">📊</span> Données (<span id="visitor-count">0</span>)
+                    <span>📊</span> Données (<span id="visitor-count">0</span>)
                 </button>
             </div>
         </div>
@@ -40,44 +52,40 @@
                 <div class="card">
                     <h2>Enregistrement du visiteur</h2>
                     <form id="registration-form">
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="nom">Nom *</label>
-                                    <input type="text" id="nom" name="nom" required>
-                                </div>
+                        <div class="form-group photo-capture">
+                            <label>Photo du visiteur</label>
+                            <div class="photo-preview" id="photo-preview">
+                                <span>📷 Aucune photo</span>
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="prenom">Prénom *</label>
-                                    <input type="text" id="prenom" name="prenom" required>
-                                </div>
+                            <div class="photo-buttons">
+                                <button type="button" id="upload-photo">
+                                    <span>📤</span> Télécharger une photo
+                                </button>
                             </div>
+                            <input type="file" id="photo-input" accept="image/*" style="display: none;">
                         </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="email">Email *</label>
-                                    <input type="email" id="email" name="email" required>
-                                </div>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="nom">Nom *</label>
+                                <input type="text" id="nom" name="nom" required>
                             </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="secteur">Secteur</label>
-                                    <select id="secteur" name="secteur">
-                                        <option value="">Sélectionnez un secteur</option>
-                                        <option value="Défense">Défense</option>
-                                        <option value="Aviation civile">Aviation civile</option>
-                                        <option value="Formation">Formation</option>
-                                        <option value="Technologie">Technologie</option>
-                                        <option value="Recherche">Recherche</option>
-                                        <option value="Autre">Autre</option>
-                                    </select>
-                                </div>
+                            <div class="form-group">
+                                <label for="prenom">Prénom *</label>
+                                <input type="text" id="prenom" name="prenom" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email *</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="secteur">Secteur / Métier</label>
+                                <input type="text" id="secteur" name="secteur" placeholder="Ex: Pilote, Ingénieur aéronautique...">
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" id="save-visitor">Enregistrer le visiteur</button>
+                            <button type="submit" id="save-visitor">
+                                <span>💾</span> Enregistrer le visiteur
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -98,39 +106,31 @@
                             <label for="remarques">Remarques et commentaires</label>
                             <textarea id="remarques" name="remarques" placeholder="Entrez vos remarques et suggestions ici..."></textarea>
                         </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="ergonomie">Ergonomie (0-5)</label>
-                                    <div class="rating-container">
-                                        <input type="range" id="ergonomie" name="ergonomie" min="0" max="5" value="3" step="1">
-                                        <span class="rating-value" id="ergonomie-value">3</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="simulation">Simulation (0-5)</label>
-                                    <div class="rating-container">
-                                        <input type="range" id="simulation" name="simulation" min="0" max="5" value="3" step="1">
-                                        <span class="rating-value" id="simulation-value">3</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-col">
-                                <div class="form-group">
-                                    <label for="ressenti">Ressenti (0-5)</label>
-                                    <div class="rating-container">
-                                        <input type="range" id="ressenti" name="ressenti" min="0" max="5" value="3" step="1">
-                                        <span class="rating-value" id="ressenti-value">3</span>
-                                    </div>
-                                </div>
+                        <div class="form-group">
+                            <label for="ergonomie">Ergonomie (0-5)</label>
+                            <div class="rating-container">
+                                <input type="range" id="ergonomie" name="ergonomie" class="rating-slider" min="0" max="5" value="3" step="1">
+                                <span class="rating-value" id="ergonomie-value">3</span>
                             </div>
                         </div>
                         <div class="form-group">
-                            <button type="submit" id="save-feedback">Enregistrer l'avis</button>
+                            <label for="simulation">Qualité de la simulation (0-5)</label>
+                            <div class="rating-container">
+                                <input type="range" id="simulation" name="simulation" class="rating-slider" min="0" max="5" value="3" step="1">
+                                <span class="rating-value" id="simulation-value">3</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="ressenti">Ressenti global (0-5)</label>
+                            <div class="rating-container">
+                                <input type="range" id="ressenti" name="ressenti" class="rating-slider" min="0" max="5" value="3" step="1">
+                                <span class="rating-value" id="ressenti-value">3</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" id="save-feedback">
+                                <span>💾</span> Enregistrer l'avis
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -139,21 +139,29 @@
             <!-- Données et exportation -->
             <div class="tab-content" id="data-tab" style="display: none;">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <h2>Données enregistrées</h2>
-                        <button id="export-button" disabled>
-                            <span class="tab-icon">📥</span> Exporter en CSV
-                        </button>
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="export-excel-photos-button" disabled>
+                                <span>📥</span> Exporter Excel + Photos (ZIP)
+                            </button>
+                            <button id="export-photos-button" disabled>
+                                <span>🖼️</span> Export HTML avec photos
+                            </button>
+                        </div>
                     </div>
                     <div id="data-table-container">
                         <table id="visitors-table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
+                                    <th>Photo</th>
                                     <th>Nom / Prénom</th>
                                     <th>Email</th>
                                     <th>Secteur</th>
-                                    <th>Evaluation</th>
+                                    <th>Évaluation</th>
                                     <th>Date</th>
+                                    <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="visitors-table-body">
@@ -172,14 +180,64 @@
     <!-- Pied de page -->
     <footer>
         <div class="container">
-            <p>Virtual Air Combat Engagement Simulator &copy; <span id="current-year"></span></p>
+            <p>ARESIA - Bolder together &copy; <span id="current-year"></span></p>
         </div>
     </footer>
 
     <!-- Notification -->
     <div id="notification" style="display: none;"></div>
 
+    <!-- Modal de modification -->
+    <div id="edit-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Modifier le visiteur</h3>
+                <button class="close-button" id="close-modal">&times;</button>
+            </div>
+            <form id="edit-form">
+                <input type="hidden" id="edit-visitor-id">
+                <div class="form-group photo-capture">
+                    <label>Photo du visiteur</label>
+                    <div class="photo-preview" id="edit-photo-preview">
+                        <span>📷 Aucune photo</span>
+                    </div>
+                    <div class="photo-buttons">
+                        <button type="button" id="edit-upload-photo">
+                            <span>📤</span> Télécharger une photo
+                        </button>
+                    </div>
+                    <input type="file" id="edit-photo-input" accept="image/*" style="display: none;">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit-nom">Nom *</label>
+                        <input type="text" id="edit-nom" name="edit-nom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-prenom">Prénom *</label>
+                        <input type="text" id="edit-prenom" name="edit-prenom" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-email">Email *</label>
+                        <input type="email" id="edit-email" name="edit-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-secteur">Secteur / Métier</label>
+                        <input type="text" id="edit-secteur" name="edit-secteur">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="submit" id="save-edit">
+                        <span>💾</span> Enregistrer les modifications
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
