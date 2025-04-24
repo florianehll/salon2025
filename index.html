@@ -5,23 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARESIA - Virtual Air Combat Engagement Simulator</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
-    <!-- En-tête -->
+    <!-- En-tête avec logo central -->
     <header>
         <div class="container">
-            <div class="logo-container">
-                <svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                    <defs>
-                        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" style="stop-color:#003366;stop-opacity:1" />
-                            <stop offset="100%" style="stop-color:#66b3ff;stop-opacity:1" />
-                        </linearGradient>
-                    </defs>
-                    <path d="M30 70 L40 30 L55 60 L75 20 L85 40 L70 70 Z" fill="url(#logoGradient)" />
-                    <text x="50" y="85" font-family="Montserrat" font-size="16" font-weight="bold" text-anchor="middle" fill="#003366">ARESIA</text>
-                </svg>
+            <!-- Grand logo en haut -->
+            <div class="main-logo-container">
+                <img src="assets/img/logo.png" alt="Logo ARESIA" class="main-logo">
             </div>
             <h1>Virtual Air Combat Engagement Simulator</h1>
         </div>
@@ -30,16 +22,22 @@
     <!-- Navigation -->
     <nav>
         <div class="container">
-            <div class="tabs">
-                <button class="tab-button active" data-tab="registration">
-                    <span>📝</span> Enregistrement
-                </button>
-                <button class="tab-button" data-tab="feedback">
-                    <span>💬</span> Avis
-                </button>
-                <button class="tab-button" data-tab="data">
-                    <span>📊</span> Données (<span id="visitor-count">0</span>)
-                </button>
+            <div class="nav-content">
+                <!-- Logo plus petit dans la navigation -->
+                <div class="nav-logo">
+                    <img src="assets/img/logo.png" alt="Logo ARESIA" class="nav-logo-img">
+                </div>
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="registration">
+                        <span>📝</span> Enregistrement
+                    </button>
+                    <button class="tab-button" data-tab="feedback">
+                        <span>💬</span> Avis
+                    </button>
+                    <button class="tab-button" data-tab="data">
+                        <span>📊</span> Données (<span id="visitor-count">0</span>)
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
@@ -179,7 +177,8 @@
 
     <!-- Pied de page -->
     <footer>
-        <div class="container">
+        <div class="container footer-content">
+            <img src="assets/img/logo.png" alt="Logo ARESIA" class="footer-logo">
             <p>ARESIA - Bolder together &copy; <span id="current-year"></span></p>
         </div>
     </footer>
@@ -238,6 +237,9 @@
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="app.js"></script>
+    <script src="assets/js/database.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/export.js"></script>
+    <script src="assets/js/app.js"></script>
 </body>
 </html>

@@ -21,25 +21,32 @@ body {
     background-color: var(--aresia-light-gray);
 }
 
+/* ==== HEADER STYLES WITH PROMINENT LOGO ==== */
 header {
     background: linear-gradient(135deg, var(--aresia-navy) 0%, var(--aresia-blue) 100%);
     color: var(--aresia-white);
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
     text-align: center;
     box-shadow: 0 2px 10px rgba(0, 51, 102, 0.2);
 }
 
-.logo-container {
+.main-logo-container {
+    margin-bottom: 1.5rem;
     display: flex;
-    align-items: center;
     justify-content: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
 }
 
-.logo {
-    width: 60px;
-    height: 60px;
+.main-logo {
+    width: 250px;
+    height: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .container {
@@ -49,6 +56,7 @@ header {
     padding: 0 1rem;
 }
 
+/* ==== NAVIGATION WITH SIDE LOGO ==== */
 nav {
     background-color: var(--aresia-white);
     padding: 0.5rem 0;
@@ -58,8 +66,26 @@ nav {
     z-index: 100;
 }
 
+.nav-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.nav-logo {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+}
+
+.nav-logo-img {
+    width: 50px;
+    height: auto;
+}
+
 .tabs {
     display: flex;
+    flex: 1;
     gap: 0.5rem;
     justify-content: center;
 }
@@ -342,6 +368,7 @@ th {
     }
 }
 
+/* ==== FOOTER WITH LOGO ==== */
 footer {
     background-color: var(--aresia-navy);
     color: var(--aresia-white);
@@ -350,7 +377,19 @@ footer {
     font-size: 0.9rem;
 }
 
-/* Styles pour le modal */
+.footer-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.footer-logo {
+    width: 80px;
+    height: auto;
+}
+
+/* ==== MODAL STYLES ==== */
 .modal {
     position: fixed;
     top: 0;
@@ -436,7 +475,26 @@ footer {
     box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
 }
 
+/* ==== RESPONSIVE STYLES ==== */
 @media (max-width: 768px) {
+    .main-logo {
+        width: 180px;
+    }
+    
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .nav-content {
+        flex-direction: column;
+        padding: 0.5rem 0;
+    }
+    
+    .nav-logo {
+        margin-bottom: 0.5rem;
+        margin-right: 0;
+    }
+    
     .tabs {
         flex-wrap: wrap;
     }
@@ -452,5 +510,9 @@ footer {
 
     .form-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .footer-content {
+        flex-direction: column;
     }
 }
