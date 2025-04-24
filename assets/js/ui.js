@@ -116,6 +116,44 @@ const refreshVisitorSelect = async () => {
     }
 };
 
+// Fonction pour adapter l'affichage du tableau selon la taille de l'écran
+const setupResponsiveTable = () => {
+    // Vérifier si nous sommes sur un appareil mobile ou petit écran
+    const isMobile = window.innerWidth <= 768;
+    const table = document.getElementById('visitors-table');
+    
+    if (table) {
+        // Si mobile, ajuster les colonnes pour un meilleur affichage
+        if (isMobile) {
+            // Simplifier les en-têtes pour mobile
+            const headerCells = table.querySelectorAll('thead th');
+            if (headerCells.length > 0) {
+                headerCells[0].textContent = 'ID';
+                headerCells[1].textContent = 'Photo';
+                headerCells[2].textContent = 'Nom';
+                headerCells[3].textContent = 'Email';
+                headerCells[4].textContent = 'Secteur';
+                headerCells[5].textContent = 'Éval.';
+                headerCells[6].textContent = 'Date';
+                headerCells[7].textContent = 'Actions';
+            }
+        } else {
+            // Revenir aux en-têtes normaux pour desktop
+            const headerCells = table.querySelectorAll('thead th');
+            if (headerCells.length > 0) {
+                headerCells[0].textContent = 'ID';
+                headerCells[1].textContent = 'Photo';
+                headerCells[2].textContent = 'Nom / Prénom';
+                headerCells[3].textContent = 'Email';
+                headerCells[4].textContent = 'Secteur';
+                headerCells[5].textContent = 'Évaluation';
+                headerCells[6].textContent = 'Date';
+                headerCells[7].textContent = 'Actions';
+            }
+        }
+    }
+};
+
 // Rafraîchir le tableau de données
 const refreshDataTable = async () => {
     try {
@@ -125,6 +163,9 @@ const refreshDataTable = async () => {
         const exportExcelPhotosButton = document.getElementById('export-excel-photos-button');
         const exportPhotosButton = document.getElementById('export-photos-button');
         const visitorCount = document.getElementById('visitor-count');
+        
+        // S'assurer que le conteneur du tableau a un défilement horizontal
+        document.getElementById('data-table-container').style.overflowX = 'auto';
         
         visitorCount.textContent = visitors.length;
         exportExcelPhotosButton.disabled = visitors.length === 0;
@@ -139,12 +180,18 @@ const refreshDataTable = async () => {
         
         emptyState.style.display = 'none';
         
+        // Déterminer si nous sommes sur mobile
+        const isMobile = window.innerWidth <= 768;
+        
         visitors.forEach(visitor => {
             const row = document.createElement('tr');
             
-            // ID
+            // ID - version plus courte sur mobile
             const idCell = document.createElement('td');
-            idCell.textContent = visitor.visitorId;
+            idCell.textContent = isMobile 
+                ? visitor.visitorId.substring(visitor.visitorId.lastIndexOf('-') + 1) 
+                : visitor.visitorId;
+            idCell.title = visitor.visitorId; // Pour afficher l'ID complet au survol
             row.appendChild(idCell);
             
             // Photo
@@ -167,7 +214,13 @@ const refreshDataTable = async () => {
             
             // Email
             const emailCell = document.createElement('td');
-            emailCell.textContent = visitor.email;
+            // Sur mobile, on tronque l'email s'il est trop long
+            if (isMobile && visitor.email.length > 15) {
+                emailCell.textContent = visitor.email.substring(0, 12) + '...';
+                emailCell.title = visitor.email; // Pour afficher l'email complet au survol
+            } else {
+                emailCell.textContent = visitor.email;
+            }
             row.appendChild(emailCell);
             
             // Secteur
@@ -205,22 +258,29 @@ const refreshDataTable = async () => {
             
             row.appendChild(ratingCell);
             
-            // Date
+            // Date - format plus court sur mobile
             const dateCell = document.createElement('td');
-            dateCell.textContent = new Date(visitor.timestamp).toLocaleString();
+            const date = new Date(visitor.timestamp);
+            dateCell.textContent = isMobile 
+                ? `${date.toLocaleDateString()}`
+                : new Date(visitor.timestamp).toLocaleString();
             row.appendChild(dateCell);
             
             // Actions
             const actionsCell = document.createElement('td');
             const editButton = document.createElement('button');
             editButton.className = 'edit-button';
-            editButton.innerHTML = '<span>✏️</span> Modifier';
+            editButton.innerHTML = isMobile ? '<span>✏️</span>' : '<span>✏️</span> Modifier';
             editButton.addEventListener('click', () => openEditModal(visitor));
             actionsCell.appendChild(editButton);
             row.appendChild(actionsCell);
             
             tableBody.appendChild(row);
         });
+        
+        // Appliquer les ajustements responsifs
+        setupResponsiveTable();
+        
     } catch (error) {
         console.error('Erreur lors du rafraîchissement du tableau de données', error);
         showNotification('Erreur lors du chargement des données', 'error');
@@ -276,3 +336,10 @@ const setupRatingSliders = () => {
         });
     });
 };
+
+// Écouteur pour détecter les changements de taille d'écran
+window.addEventListener('resize', () => {
+    if (activeTab === 'data') {
+        setupResponsiveTable();
+    }
+});
