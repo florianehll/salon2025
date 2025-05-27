@@ -5,6 +5,8 @@
     --aresia-white: #ffffff;
     --aresia-light-gray: #f5f7fa;
     --aresia-gray: #e3e8ee;
+    --aresia-green: #00b894;
+    --aresia-light-green: #00cec9;
 }
 
 * {
@@ -143,6 +145,49 @@ h2 {
     margin-bottom: 1.5rem;
 }
 
+/* Styles pour les champs spécifiques aux pilotes */
+.pilot-fields {
+    display: none;
+    grid-column: 1 / -1;
+    border: 2px solid var(--aresia-light-blue);
+    border-radius: 10px;
+    padding: 1.5rem;
+    background-color: rgba(0, 102, 204, 0.05);
+    margin-top: 1.5rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+.pilot-fields.show {
+    display: block;
+}
+
+.pilot-fields h3 {
+    color: var(--aresia-navy);
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+}
+
+.pilot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 label {
     display: block;
     margin-bottom: 0.5rem;
@@ -200,6 +245,7 @@ textarea {
     display: flex;
     gap: 1rem;
     justify-content: center;
+    flex-wrap: wrap;
 }
 
 .rating-container {
@@ -272,6 +318,24 @@ button:disabled {
     transform: none;
 }
 
+.camera-button {
+    background: linear-gradient(135deg, var(--aresia-green) 0%, var(--aresia-light-green) 100%);
+}
+
+.camera-button:hover {
+    box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+}
+
+.capture-button {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    font-size: 1.2rem;
+    padding: 1rem 2rem;
+}
+
+.capture-button:hover {
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
 /* Styles pour les tableaux responsifs */
 #data-table-container {
     overflow-x: auto;
@@ -283,6 +347,7 @@ table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
+    min-width: 1200px;
 }
 
 thead {
@@ -293,6 +358,7 @@ th, td {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid var(--aresia-gray);
+    white-space: nowrap;
 }
 
 th {
@@ -316,6 +382,7 @@ th {
     font-size: 0.8rem;
     font-weight: 600;
     margin-right: 0.3rem;
+    margin-bottom: 0.2rem;
 }
 
 .badge-blue {
@@ -331,6 +398,11 @@ th {
 .badge-purple {
     background-color: rgba(102, 0, 204, 0.1);
     color: #6600cc;
+}
+
+.badge-orange {
+    background-color: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
 }
 
 .empty-state {
@@ -484,6 +556,27 @@ footer {
     box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
 }
 
+/* Camera modal styles */
+.camera-container {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+#video-preview {
+    width: 100%;
+    border-radius: 10px;
+    background: #000;
+}
+
+.camera-controls {
+    margin-top: 1rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
 /* ==== RESPONSIVE STYLES ==== */
 @media (max-width: 768px) {
     .main-logo {
@@ -525,6 +618,16 @@ footer {
         flex-direction: column;
     }
     
+    .photo-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .photo-buttons button {
+        width: 100%;
+        max-width: 200px;
+    }
+    
     /* Améliorer l'affichage des boutons d'export sur mobile */
     #data-tab .card > div:first-child {
         flex-direction: column;
@@ -552,30 +655,13 @@ footer {
         font-size: 0.9rem;
     }
     
-    /* Ajuster la largeur des cellules pour le mobile */
-    #visitors-table th:nth-child(1), 
-    #visitors-table td:nth-child(1) {
-        min-width: 80px; /* ID */
-    }
-    
-    #visitors-table th:nth-child(3), 
-    #visitors-table td:nth-child(3) {
-        min-width: 120px; /* Nom/Prénom */
-    }
-    
-    #visitors-table th:nth-child(4), 
-    #visitors-table td:nth-child(4) {
-        min-width: 150px; /* Email */
-    }
-    
-    #visitors-table th:nth-child(7), 
-    #visitors-table td:nth-child(7) {
-        min-width: 120px; /* Date */
-    }
-    
     /* Réduire la taille du texte dans les badges pour mobile */
     .badge {
         font-size: 0.7rem;
         padding: 0.2rem 0.5rem;
+    }
+    
+    table {
+        min-width: 800px;
     }
 }

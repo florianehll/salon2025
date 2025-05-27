@@ -4,8 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARESIA - Virtual Air Combat Engagement Simulator</title>
+    
+    <!-- Déclarations des polices Comfortaa directement dans le HTML -->
     <style>
-        /* Déclarations des polices Comfortaa directement dans le HTML */
         @font-face {
             font-family: 'Comfortaa';
             src: url('./assets/fonts/Comfortaa-Regular.ttf') format('truetype');
@@ -41,7 +42,19 @@
             font-style: normal;
         }
     </style>
+    
     <link rel="stylesheet" href="assets/css/styles.css">
+    
+    <!-- Meta tags pour améliorer l'expérience -->
+    <meta name="description" content="ARESIA - Application d'enregistrement des visiteurs pour salon d'exposition">
+    <meta name="keywords" content="ARESIA, simulateur, aviation, salon, visiteurs">
+    <meta name="author" content="ARESIA Team">
+    
+    <!-- Manifest pour PWA (optionnel) -->
+    <meta name="theme-color" content="#003366">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/img/logo.png">
 </head>
 <body>
     <!-- En-tête avec logo central -->
@@ -64,13 +77,13 @@
                     <img src="assets/img/logo.png" alt="Logo ARESIA" class="nav-logo-img">
                 </div>
                 <div class="tabs">
-                    <button class="tab-button active" data-tab="registration">
+                    <button class="tab-button active" data-tab="registration" title="Enregistrer un nouveau visiteur (Ctrl+1)">
                         <span>📝</span> Enregistrement
                     </button>
-                    <button class="tab-button" data-tab="feedback">
+                    <button class="tab-button" data-tab="feedback" title="Recueillir l'avis d'un visiteur (Ctrl+2)">
                         <span>💬</span> Avis
                     </button>
-                    <button class="tab-button" data-tab="data">
+                    <button class="tab-button" data-tab="data" title="Consulter et exporter les données (Ctrl+3)">
                         <span>📊</span> Données (<span id="visitor-count">0</span>)
                     </button>
                 </div>
@@ -85,37 +98,88 @@
             <div class="tab-content active" id="registration-tab">
                 <div class="card">
                     <h2>Enregistrement du visiteur</h2>
-                    <form id="registration-form">
+                    <form id="registration-form" autocomplete="off">
+                        <!-- Section photo -->
                         <div class="form-group photo-capture">
                             <label>Photo du visiteur</label>
                             <div class="photo-preview" id="photo-preview">
                                 <span>📷 Aucune photo</span>
                             </div>
                             <div class="photo-buttons">
-                                <button type="button" id="upload-photo">
+                                <button type="button" id="upload-photo" title="Sélectionner une photo depuis l'appareil">
                                     <span>📤</span> Télécharger une photo
+                                </button>
+                                <button type="button" id="take-photo" class="camera-button" title="Prendre une photo avec la caméra">
+                                    <span>📸</span> Prendre une photo
                                 </button>
                             </div>
                             <input type="file" id="photo-input" accept="image/*" style="display: none;">
                         </div>
+                        
+                        <!-- Informations personnelles -->
                         <div class="form-grid">
                             <div class="form-group">
                                 <label for="nom">Nom *</label>
-                                <input type="text" id="nom" name="nom" required>
+                                <input type="text" id="nom" name="nom" required autocomplete="family-name" 
+                                       placeholder="Entrez le nom de famille">
                             </div>
                             <div class="form-group">
                                 <label for="prenom">Prénom *</label>
-                                <input type="text" id="prenom" name="prenom" required>
+                                <input type="text" id="prenom" name="prenom" required autocomplete="given-name"
+                                       placeholder="Entrez le prénom">
                             </div>
                             <div class="form-group">
                                 <label for="email">Email *</label>
-                                <input type="email" id="email" name="email" required>
+                                <input type="email" id="email" name="email" required autocomplete="email"
+                                       placeholder="exemple@email.com">
                             </div>
                             <div class="form-group">
-                                <label for="secteur">Secteur / Métier</label>
-                                <input type="text" id="secteur" name="secteur" placeholder="Ex: Pilote, Ingénieur aéronautique...">
+                                <label for="age-range">Tranche d'âge *</label>
+                                <select id="age-range" name="age-range" required>
+                                    <option value="">Sélectionnez votre tranche d'âge</option>
+                                    <option value="-20">Moins de 20 ans</option>
+                                    <option value="20-25">20-25 ans</option>
+                                    <option value="25-30">25-30 ans</option>
+                                    <option value="30-35">30-35 ans</option>
+                                    <option value="35-40">35-40 ans</option>
+                                    <option value="40-45">40-45 ans</option>
+                                    <option value="45-50">45-50 ans</option>
+                                    <option value="50-55">50-55 ans</option>
+                                    <option value="55-60">55-60 ans</option>
+                                    <option value="60+">60 ans et plus</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="secteur">Secteur / Métier *</label>
+                                <input type="text" id="secteur" name="secteur" required autocomplete="organization-title"
+                                       placeholder="Ex: Pilote, Ingénieur aéronautique, Militaire...">
+                                <small style="color: #666; font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                                    💡 Tapez "Pilote" pour accéder aux champs spécialisés
+                                </small>
                             </div>
                         </div>
+                        
+                        <!-- Champs spécifiques aux pilotes -->
+                        <div class="pilot-fields" id="pilot-fields">
+                            <h3><span>✈️</span> Informations pilote</h3>
+                            <div class="pilot-grid">
+                                <div class="form-group">
+                                    <label for="aircraft-type">Type d'avion</label>
+                                    <input type="text" id="aircraft-type" name="aircraft-type" 
+                                           placeholder="Ex: A320, Boeing 737, Rafale, Cessna 172...">
+                                </div>
+                                <div class="form-group">
+                                    <label for="flight-hours">Heures de vol</label>
+                                    <input type="number" id="flight-hours" name="flight-hours" 
+                                           placeholder="Ex: 1500" min="0" max="50000" step="1">
+                                    <small style="color: #666; font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                                        Nombre total d'heures de vol
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bouton de soumission -->
                         <div class="form-group">
                             <button type="submit" id="save-visitor">
                                 <span>💾</span> Enregistrer le visiteur
@@ -131,36 +195,58 @@
                     <h2>Recueillir l'avis du visiteur</h2>
                     <form id="feedback-form">
                         <div class="form-group">
-                            <label for="visitor-select">Sélectionner un visiteur</label>
+                            <label for="visitor-select">Sélectionner un visiteur *</label>
                             <select id="visitor-select" name="visitor-select" required>
                                 <option value="">Sélectionnez un visiteur</option>
                             </select>
+                            <small style="color: #666; font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                                Les visiteurs sont triés du plus récent au plus ancien
+                            </small>
                         </div>
+                        
                         <div class="form-group">
                             <label for="remarques">Remarques et commentaires</label>
-                            <textarea id="remarques" name="remarques" placeholder="Entrez vos remarques et suggestions ici..."></textarea>
+                            <textarea id="remarques" name="remarques" 
+                                      placeholder="Entrez les remarques, suggestions ou commentaires du visiteur..."></textarea>
                         </div>
+                        
+                        <!-- Évaluations avec sliders -->
                         <div class="form-group">
                             <label for="ergonomie">Ergonomie (0-5)</label>
                             <div class="rating-container">
-                                <input type="range" id="ergonomie" name="ergonomie" class="rating-slider" min="0" max="5" value="3" step="1">
+                                <input type="range" id="ergonomie" name="ergonomie" class="rating-slider" 
+                                       min="0" max="5" value="3" step="1">
                                 <span class="rating-value" id="ergonomie-value">3</span>
                             </div>
+                            <small style="color: #666; font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                                Interface utilisateur, confort des commandes, facilité d'utilisation
+                            </small>
                         </div>
+                        
                         <div class="form-group">
                             <label for="simulation">Qualité de la simulation (0-5)</label>
                             <div class="rating-container">
-                                <input type="range" id="simulation" name="simulation" class="rating-slider" min="0" max="5" value="3" step="1">
+                                <input type="range" id="simulation" name="simulation" class="rating-slider" 
+                                       min="0" max="5" value="3" step="1">
                                 <span class="rating-value" id="simulation-value">3</span>
                             </div>
+                            <small style="color: #666; font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                                Réalisme, physique de vol, environnement visuel
+                            </small>
                         </div>
+                        
                         <div class="form-group">
                             <label for="ressenti">Ressenti global (0-5)</label>
                             <div class="rating-container">
-                                <input type="range" id="ressenti" name="ressenti" class="rating-slider" min="0" max="5" value="3" step="1">
+                                <input type="range" id="ressenti" name="ressenti" class="rating-slider" 
+                                       min="0" max="5" value="3" step="1">
                                 <span class="rating-value" id="ressenti-value">3</span>
                             </div>
+                            <small style="color: #666; font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                                Impression générale, satisfaction, recommandation
+                            </small>
                         </div>
+                        
                         <div class="form-group">
                             <button type="submit" id="save-feedback">
                                 <span>💾</span> Enregistrer l'avis
@@ -173,17 +259,19 @@
             <!-- Données et exportation -->
             <div class="tab-content" id="data-tab" style="display: none;">
                 <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-                        <h2>Données enregistrées</h2>
-                        <div style="display: flex; gap: 1rem;">
-                            <button id="export-excel-photos-button" disabled>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                        <h2 style="margin: 0;">Données enregistrées</h2>
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <button id="export-excel-photos-button" disabled title="Exporter toutes les données avec photos dans un fichier ZIP">
                                 <span>📥</span> Exporter Excel + Photos (ZIP)
                             </button>
-                            <button id="export-photos-button" disabled>
+                            <button id="export-photos-button" disabled title="Créer un rapport HTML avec photos">
                                 <span>🖼️</span> Export HTML avec photos
                             </button>
                         </div>
                     </div>
+                    
+                    <!-- Tableau des données -->
                     <div id="data-table-container">
                         <table id="visitors-table">
                             <thead>
@@ -192,7 +280,9 @@
                                     <th>Photo</th>
                                     <th>Nom / Prénom</th>
                                     <th>Email</th>
+                                    <th>Âge</th>
                                     <th>Secteur</th>
+                                    <th>Info Pilote</th>
                                     <th>Évaluation</th>
                                     <th>Date</th>
                                     <th>Actions</th>
@@ -202,8 +292,12 @@
                                 <!-- Les données seront ajoutées via JavaScript -->
                             </tbody>
                         </table>
+                        
+                        <!-- État vide -->
                         <div id="empty-state" class="empty-state">
-                            Aucune donnée enregistrée pour le moment
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📋</div>
+                            <h3>Aucune donnée enregistrée</h3>
+                            <p>Commencez par enregistrer votre premier visiteur dans l'onglet "Enregistrement"</p>
                         </div>
                     </div>
                 </div>
@@ -215,22 +309,54 @@
     <footer>
         <div class="container footer-content">
             <img src="assets/img/logo.png" alt="Logo ARESIA" class="footer-logo">
-            <p>ARESIA - Bolder together &copy; <span id="current-year"></span></p>
+            <div>
+                <p>ARESIA - Bolder together &copy; <span id="current-year"></span></p>
+                <p style="font-size: 0.8rem; margin-top: 0.3rem; opacity: 0.8;">
+                    Virtual Air Combat Engagement Simulator
+                </p>
+            </div>
         </div>
     </footer>
 
     <!-- Notification -->
     <div id="notification" style="display: none;"></div>
 
+    <!-- Modal de caméra -->
+    <div id="camera-modal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Prendre une photo</h3>
+                <button class="close-button" id="close-camera-modal" title="Fermer (Échap)">&times;</button>
+            </div>
+            <div class="camera-container">
+                <video id="video-preview" autoplay playsinline muted></video>
+                <canvas id="photo-canvas" style="display: none;"></canvas>
+            </div>
+            <div class="camera-controls">
+                <button type="button" id="capture-photo" class="capture-button">
+                    <span>📸</span> Capturer
+                </button>
+                <button type="button" id="cancel-camera">
+                    <span>❌</span> Annuler
+                </button>
+            </div>
+            <p style="text-align: center; color: #666; font-size: 0.9rem; margin-top: 1rem;">
+                💡 Positionnez le visiteur face à la caméra puis cliquez sur "Capturer"
+            </p>
+        </div>
+    </div>
+
     <!-- Modal de modification -->
     <div id="edit-modal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h3>Modifier le visiteur</h3>
-                <button class="close-button" id="close-modal">&times;</button>
+                <button class="close-button" id="close-modal" title="Fermer (Échap)">&times;</button>
             </div>
             <form id="edit-form">
                 <input type="hidden" id="edit-visitor-id">
+                
+                <!-- Section photo pour l'édition -->
                 <div class="form-group photo-capture">
                     <label>Photo du visiteur</label>
                     <div class="photo-preview" id="edit-photo-preview">
@@ -238,11 +364,16 @@
                     </div>
                     <div class="photo-buttons">
                         <button type="button" id="edit-upload-photo">
-                            <span>📤</span> Télécharger une photo
+                            <span>📤</span> Télécharger
+                        </button>
+                        <button type="button" id="edit-take-photo" class="camera-button">
+                            <span>📸</span> Prendre une photo
                         </button>
                     </div>
                     <input type="file" id="edit-photo-input" accept="image/*" style="display: none;">
                 </div>
+                
+                <!-- Champs d'édition -->
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="edit-nom">Nom *</label>
@@ -257,10 +388,44 @@
                         <input type="email" id="edit-email" name="edit-email" required>
                     </div>
                     <div class="form-group">
-                        <label for="edit-secteur">Secteur / Métier</label>
-                        <input type="text" id="edit-secteur" name="edit-secteur">
+                        <label for="edit-age-range">Tranche d'âge *</label>
+                        <select id="edit-age-range" name="edit-age-range" required>
+                            <option value="">Sélectionnez votre tranche d'âge</option>
+                            <option value="-20">Moins de 20 ans</option>
+                            <option value="20-25">20-25 ans</option>
+                            <option value="25-30">25-30 ans</option>
+                            <option value="30-35">30-35 ans</option>
+                            <option value="35-40">35-40 ans</option>
+                            <option value="40-45">40-45 ans</option>
+                            <option value="45-50">45-50 ans</option>
+                            <option value="50-55">50-55 ans</option>
+                            <option value="55-60">55-60 ans</option>
+                            <option value="60+">60 ans et plus</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-secteur">Secteur / Métier *</label>
+                        <input type="text" id="edit-secteur" name="edit-secteur" required>
                     </div>
                 </div>
+                
+                <!-- Champs spécifiques aux pilotes pour l'édition -->
+                <div class="pilot-fields" id="edit-pilot-fields">
+                    <h3><span>✈️</span> Informations pilote</h3>
+                    <div class="pilot-grid">
+                        <div class="form-group">
+                            <label for="edit-aircraft-type">Type d'avion</label>
+                            <input type="text" id="edit-aircraft-type" name="edit-aircraft-type" 
+                                   placeholder="Ex: A320, Boeing 737, Rafale...">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-flight-hours">Heures de vol</label>
+                            <input type="number" id="edit-flight-hours" name="edit-flight-hours" 
+                                   placeholder="Ex: 1500" min="0" max="50000">
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <button type="submit" id="save-edit">
                         <span>💾</span> Enregistrer les modifications
@@ -277,5 +442,64 @@
     <script src="assets/js/ui.js"></script>
     <script src="assets/js/export.js"></script>
     <script src="assets/js/app.js"></script>
+    
+    <!-- Script pour améliorer l'expérience utilisateur -->
+    <script>
+        // Désactiver le zoom sur double-tap sur mobile
+        document.addEventListener('touchstart', function(event) {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        });
+        
+        // Prévenir le comportement par défaut du glisser-déposer
+        document.addEventListener('dragover', function(e) {
+            e.preventDefault();
+        });
+        
+        document.addEventListener('drop', function(e) {
+            e.preventDefault();
+        });
+        
+        // Améliorer l'accessibilité avec les raccourcis clavier
+        document.addEventListener('keydown', function(event) {
+            // F1 pour l'aide (optionnel)
+            if (event.key === 'F1') {
+                event.preventDefault();
+                alert('Raccourcis clavier:\n' +
+                      '• Ctrl+1 : Onglet Enregistrement\n' +
+                      '• Ctrl+2 : Onglet Avis\n' +
+                      '• Ctrl+3 : Onglet Données\n' +
+                      '• Échap : Fermer les fenêtres\n' +
+                      '• Tab : Navigation entre les champs');
+            }
+        });
+        
+        // Afficher un message de confirmation avant de quitter si des données sont en cours de saisie
+        window.addEventListener('beforeunload', function(event) {
+            const forms = document.querySelectorAll('form');
+            let hasUnsavedData = false;
+            
+            forms.forEach(form => {
+                const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea, select');
+                inputs.forEach(input => {
+                    if (input.value.trim() !== '' && input.value !== input.defaultValue) {
+                        hasUnsavedData = true;
+                    }
+                });
+            });
+            
+            if (hasUnsavedData) {
+                event.preventDefault();
+                event.returnValue = 'Vous avez des données non sauvegardées. Voulez-vous vraiment quitter ?';
+                return event.returnValue;
+            }
+        });
+        
+        // Log de démarrage
+        console.log('🚁 ARESIA - Virtual Air Combat Engagement Simulator');
+        console.log('📱 Application chargée avec succès');
+        console.log('💡 Utilisez F1 pour voir les raccourcis clavier');
+    </script>
 </body>
 </html>

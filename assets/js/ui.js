@@ -2,12 +2,14 @@
 let currentPhotoData = null;
 let editPhotoData = null;
 let activeTab = 'registration';
+let currentStream = null;
+let isEditMode = false;
 
 // Gestion de l'interface utilisateur
 const setupPhotoUpload = () => {
     const uploadButton = document.getElementById('upload-photo');
+    const takePhotoButton = document.getElementById('take-photo');
     const photoInput = document.getElementById('photo-input');
-    const photoPreview = document.getElementById('photo-preview');
 
     // Upload photo depuis fichier
     uploadButton.addEventListener('click', () => {
@@ -26,12 +28,24 @@ const setupPhotoUpload = () => {
         }
     });
 
+    // Prendre une photo avec la caméra
+    takePhotoButton.addEventListener('click', () => {
+        isEditMode = false;
+        openCameraModal();
+    });
+
     // Configuration pour le modal d'édition
     const editUploadButton = document.getElementById('edit-upload-photo');
+    const editTakePhotoButton = document.getElementById('edit-take-photo');
     const editPhotoInput = document.getElementById('edit-photo-input');
 
     editUploadButton.addEventListener('click', () => {
         editPhotoInput.click();
+    });
+
+    editTakePhotoButton.addEventListener('click', () => {
+        isEditMode = true;
+        openCameraModal();
     });
 
     editPhotoInput.addEventListener('change', (event) => {
@@ -45,6 +59,77 @@ const setupPhotoUpload = () => {
             reader.readAsDataURL(file);
         }
     });
+
+    // Configuration de la caméra
+    setupCameraModal();
+};
+
+// Configuration du modal de caméra
+const setupCameraModal = () => {
+    const cameraModal = document.getElementById('camera-modal');
+    const closeCameraButton = document.getElementById('close-camera-modal');
+    const cancelCameraButton = document.getElementById('cancel-camera');
+    const captureButton = document.getElementById('capture-photo');
+    const video = document.getElementById('video-preview');
+    const canvas = document.getElementById('photo-canvas');
+
+    closeCameraButton.addEventListener('click', closeCameraModal);
+    cancelCameraButton.addEventListener('click', closeCameraModal);
+
+    captureButton.addEventListener('click', () => {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0);
+        
+        const photoData = canvas.toDataURL('image/jpeg', 0.8);
+        
+        if (isEditMode) {
+            editPhotoData = photoData;
+            updatePhotoPreview(editPhotoData, 'edit-photo-preview');
+        } else {
+            currentPhotoData = photoData;
+            updatePhotoPreview(currentPhotoData, 'photo-preview');
+        }
+        
+        closeCameraModal();
+    });
+};
+
+// Ouvrir le modal de caméra
+const openCameraModal = async () => {
+    const cameraModal = document.getElementById('camera-modal');
+    const video = document.getElementById('video-preview');
+    
+    try {
+        currentStream = await navigator.mediaDevices.getUserMedia({ 
+            video: { 
+                facingMode: 'user', // Préférer la caméra avant
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            } 
+        });
+        
+        video.srcObject = currentStream;
+        cameraModal.style.display = 'flex';
+    } catch (error) {
+        console.error('Erreur d\'accès à la caméra:', error);
+        showNotification('Impossible d\'accéder à la caméra. Vérifiez les permissions.', 'error');
+    }
+};
+
+// Fermer le modal de caméra
+const closeCameraModal = () => {
+    const cameraModal = document.getElementById('camera-modal');
+    const video = document.getElementById('video-preview');
+    
+    if (currentStream) {
+        currentStream.getTracks().forEach(track => track.stop());
+        currentStream = null;
+    }
+    
+    video.srcObject = null;
+    cameraModal.style.display = 'none';
 };
 
 // Mettre à jour l'aperçu de la photo
@@ -92,6 +177,35 @@ const switchTab = tabId => {
     }
 };
 
+// Gestion des champs spécifiques aux pilotes
+const setupPilotFields = () => {
+    const secteurInput = document.getElementById('secteur');
+    const pilotFields = document.getElementById('pilot-fields');
+    
+    const editSecteurInput = document.getElementById('edit-secteur');
+    const editPilotFields = document.getElementById('edit-pilot-fields');
+
+    // Pour le formulaire d'enregistrement
+    secteurInput.addEventListener('input', () => {
+        const value = secteurInput.value.toLowerCase().trim();
+        if (value === 'pilote') {
+            pilotFields.classList.add('show');
+        } else {
+            pilotFields.classList.remove('show');
+        }
+    });
+
+    // Pour le formulaire d'édition
+    editSecteurInput.addEventListener('input', () => {
+        const value = editSecteurInput.value.toLowerCase().trim();
+        if (value === 'pilote') {
+            editPilotFields.classList.add('show');
+        } else {
+            editPilotFields.classList.remove('show');
+        }
+    });
+};
+
 // Rafraîchir la liste déroulante des visiteurs
 const refreshVisitorSelect = async () => {
     try {
@@ -116,44 +230,6 @@ const refreshVisitorSelect = async () => {
     }
 };
 
-// Fonction pour adapter l'affichage du tableau selon la taille de l'écran
-const setupResponsiveTable = () => {
-    // Vérifier si nous sommes sur un appareil mobile ou petit écran
-    const isMobile = window.innerWidth <= 768;
-    const table = document.getElementById('visitors-table');
-    
-    if (table) {
-        // Si mobile, ajuster les colonnes pour un meilleur affichage
-        if (isMobile) {
-            // Simplifier les en-têtes pour mobile
-            const headerCells = table.querySelectorAll('thead th');
-            if (headerCells.length > 0) {
-                headerCells[0].textContent = 'ID';
-                headerCells[1].textContent = 'Photo';
-                headerCells[2].textContent = 'Nom';
-                headerCells[3].textContent = 'Email';
-                headerCells[4].textContent = 'Secteur';
-                headerCells[5].textContent = 'Éval.';
-                headerCells[6].textContent = 'Date';
-                headerCells[7].textContent = 'Actions';
-            }
-        } else {
-            // Revenir aux en-têtes normaux pour desktop
-            const headerCells = table.querySelectorAll('thead th');
-            if (headerCells.length > 0) {
-                headerCells[0].textContent = 'ID';
-                headerCells[1].textContent = 'Photo';
-                headerCells[2].textContent = 'Nom / Prénom';
-                headerCells[3].textContent = 'Email';
-                headerCells[4].textContent = 'Secteur';
-                headerCells[5].textContent = 'Évaluation';
-                headerCells[6].textContent = 'Date';
-                headerCells[7].textContent = 'Actions';
-            }
-        }
-    }
-};
-
 // Rafraîchir le tableau de données
 const refreshDataTable = async () => {
     try {
@@ -163,9 +239,6 @@ const refreshDataTable = async () => {
         const exportExcelPhotosButton = document.getElementById('export-excel-photos-button');
         const exportPhotosButton = document.getElementById('export-photos-button');
         const visitorCount = document.getElementById('visitor-count');
-        
-        // S'assurer que le conteneur du tableau a un défilement horizontal
-        document.getElementById('data-table-container').style.overflowX = 'auto';
         
         visitorCount.textContent = visitors.length;
         exportExcelPhotosButton.disabled = visitors.length === 0;
@@ -191,7 +264,7 @@ const refreshDataTable = async () => {
             idCell.textContent = isMobile 
                 ? visitor.visitorId.substring(visitor.visitorId.lastIndexOf('-') + 1) 
                 : visitor.visitorId;
-            idCell.title = visitor.visitorId; // Pour afficher l'ID complet au survol
+            idCell.title = visitor.visitorId;
             row.appendChild(idCell);
             
             // Photo
@@ -214,19 +287,46 @@ const refreshDataTable = async () => {
             
             // Email
             const emailCell = document.createElement('td');
-            // Sur mobile, on tronque l'email s'il est trop long
             if (isMobile && visitor.email.length > 15) {
                 emailCell.textContent = visitor.email.substring(0, 12) + '...';
-                emailCell.title = visitor.email; // Pour afficher l'email complet au survol
+                emailCell.title = visitor.email;
             } else {
                 emailCell.textContent = visitor.email;
             }
             row.appendChild(emailCell);
             
+            // Tranche d'âge
+            const ageCell = document.createElement('td');
+            ageCell.textContent = visitor.ageRange || '-';
+            row.appendChild(ageCell);
+            
             // Secteur
             const sectorCell = document.createElement('td');
             sectorCell.textContent = visitor.secteur || '-';
             row.appendChild(sectorCell);
+            
+            // Informations pilote
+            const pilotInfoCell = document.createElement('td');
+            if (visitor.secteur && visitor.secteur.toLowerCase() === 'pilote' && 
+                (visitor.aircraftType || visitor.flightHours)) {
+                
+                if (visitor.aircraftType) {
+                    const aircraftBadge = document.createElement('span');
+                    aircraftBadge.className = 'badge badge-orange';
+                    aircraftBadge.textContent = visitor.aircraftType;
+                    pilotInfoCell.appendChild(aircraftBadge);
+                }
+                
+                if (visitor.flightHours) {
+                    const hoursBadge = document.createElement('span');
+                    hoursBadge.className = 'badge badge-blue';
+                    hoursBadge.textContent = `${visitor.flightHours}h`;
+                    pilotInfoCell.appendChild(hoursBadge);
+                }
+            } else {
+                pilotInfoCell.textContent = '-';
+            }
+            row.appendChild(pilotInfoCell);
             
             // Évaluation
             const ratingCell = document.createElement('td');
@@ -278,9 +378,6 @@ const refreshDataTable = async () => {
             tableBody.appendChild(row);
         });
         
-        // Appliquer les ajustements responsifs
-        setupResponsiveTable();
-        
     } catch (error) {
         console.error('Erreur lors du rafraîchissement du tableau de données', error);
         showNotification('Erreur lors du chargement des données', 'error');
@@ -297,7 +394,23 @@ const openEditModal = async (visitor) => {
     document.getElementById('edit-nom').value = visitor.nom;
     document.getElementById('edit-prenom').value = visitor.prenom;
     document.getElementById('edit-email').value = visitor.email;
+    document.getElementById('edit-age-range').value = visitor.ageRange || '';
     document.getElementById('edit-secteur').value = visitor.secteur || '';
+    
+    // Champs spécifiques aux pilotes
+    const editPilotFields = document.getElementById('edit-pilot-fields');
+    const editAircraftType = document.getElementById('edit-aircraft-type');
+    const editFlightHours = document.getElementById('edit-flight-hours');
+    
+    if (visitor.secteur && visitor.secteur.toLowerCase() === 'pilote') {
+        editPilotFields.classList.add('show');
+        editAircraftType.value = visitor.aircraftType || '';
+        editFlightHours.value = visitor.flightHours || '';
+    } else {
+        editPilotFields.classList.remove('show');
+        editAircraftType.value = '';
+        editFlightHours.value = '';
+    }
     
     // Afficher la photo actuelle
     editPhotoData = visitor.photo;
@@ -311,6 +424,7 @@ const closeEditModal = () => {
     modal.style.display = 'none';
     editPhotoData = null;
     document.getElementById('edit-form').reset();
+    document.getElementById('edit-pilot-fields').classList.remove('show');
 };
 
 // Mettre à jour le compteur de visiteurs
@@ -340,6 +454,20 @@ const setupRatingSliders = () => {
 // Écouteur pour détecter les changements de taille d'écran
 window.addEventListener('resize', () => {
     if (activeTab === 'data') {
-        setupResponsiveTable();
+        refreshDataTable();
+    }
+});
+
+// Fermer les modals en cliquant à l'extérieur
+window.addEventListener('click', (event) => {
+    const cameraModal = document.getElementById('camera-modal');
+    const editModal = document.getElementById('edit-modal');
+    
+    if (event.target === cameraModal) {
+        closeCameraModal();
+    }
+    
+    if (event.target === editModal) {
+        closeEditModal();
     }
 });
