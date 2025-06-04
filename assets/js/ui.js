@@ -295,10 +295,54 @@ const refreshDataTable = async () => {
             }
             row.appendChild(emailCell);
             
+            // Entreprise
+            const entrepriseCell = document.createElement('td');
+            const entrepriseText = visitor.entreprise || '-';
+            if (isMobile && entrepriseText.length > 15) {
+                entrepriseCell.textContent = entrepriseText.substring(0, 12) + '...';
+                entrepriseCell.title = entrepriseText;
+            } else {
+                entrepriseCell.textContent = entrepriseText;
+            }
+            row.appendChild(entrepriseCell);
+            
+            // Pays
+            const paysCell = document.createElement('td');
+            const paysText = visitor.pays || '-';
+            if (isMobile && paysText.length > 15) {
+                paysCell.textContent = paysText.substring(0, 12) + '...';
+                paysCell.title = paysText;
+            } else {
+                paysCell.textContent = paysText;
+            }
+            row.appendChild(paysCell);
+            
             // Tranche d'âge
             const ageCell = document.createElement('td');
             ageCell.textContent = visitor.ageRange || '-';
             row.appendChild(ageCell);
+            
+            // Profil visiteur
+            const profilCell = document.createElement('td');
+            const profilBadge = document.createElement('span');
+            profilBadge.className = 'badge badge-blue';
+            profilBadge.textContent = visitor.profilVisiteur || '-';
+            
+            // Adapter le style selon le profil
+            if (visitor.profilVisiteur) {
+                if (visitor.profilVisiteur.includes('militaire')) {
+                    profilBadge.className = 'badge badge-green';
+                } else if (visitor.profilVisiteur.includes('industriel')) {
+                    profilBadge.className = 'badge badge-orange';
+                }
+                
+                if (visitor.profilVisiteur.includes('décideur')) {
+                    profilBadge.style.fontWeight = 'bold';
+                }
+            }
+            
+            profilCell.appendChild(profilBadge);
+            row.appendChild(profilCell);
             
             // Secteur
             const sectorCell = document.createElement('td');
@@ -394,7 +438,10 @@ const openEditModal = async (visitor) => {
     document.getElementById('edit-nom').value = visitor.nom;
     document.getElementById('edit-prenom').value = visitor.prenom;
     document.getElementById('edit-email').value = visitor.email;
+    document.getElementById('edit-entreprise').value = visitor.entreprise || '';
+    document.getElementById('edit-pays').value = visitor.pays || '';
     document.getElementById('edit-age-range').value = visitor.ageRange || '';
+    document.getElementById('edit-profil-visiteur').value = visitor.profilVisiteur || '';
     document.getElementById('edit-secteur').value = visitor.secteur || '';
     
     // Champs spécifiques aux pilotes

@@ -134,6 +134,16 @@
                                        placeholder="exemple@email.com">
                             </div>
                             <div class="form-group">
+                                <label for="entreprise">Entreprise</label>
+                                <input type="text" id="entreprise" name="entreprise" autocomplete="organization"
+                                       placeholder="Nom de l'entreprise/organisation">
+                            </div>
+                            <div class="form-group">
+                                <label for="pays">Pays</label>
+                                <input type="text" id="pays" name="pays" autocomplete="country"
+                                       placeholder="Pays de résidence">
+                            </div>
+                            <div class="form-group">
                                 <label for="age-range">Tranche d'âge *</label>
                                 <select id="age-range" name="age-range" required>
                                     <option value="">Sélectionnez votre tranche d'âge</option>
@@ -147,6 +157,16 @@
                                     <option value="50-55">50-55 ans</option>
                                     <option value="55-60">55-60 ans</option>
                                     <option value="60+">60 ans et plus</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="profil-visiteur">Profil visiteur *</label>
+                                <select id="profil-visiteur" name="profil-visiteur" required>
+                                    <option value="">Sélectionnez votre profil</option>
+                                    <option value="décideur militaire">Décideur militaire</option>
+                                    <option value="décideur industriel">Décideur industriel</option>
+                                    <option value="opérationnel militaire">Opérationnel militaire</option>
+                                    <option value="opérationnel industriel">Opérationnel industriel</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -280,7 +300,10 @@
                                     <th>Photo</th>
                                     <th>Nom / Prénom</th>
                                     <th>Email</th>
+                                    <th>Entreprise</th>
+                                    <th>Pays</th>
                                     <th>Âge</th>
+                                    <th>Profil</th>
                                     <th>Secteur</th>
                                     <th>Info Pilote</th>
                                     <th>Évaluation</th>
@@ -388,6 +411,14 @@
                         <input type="email" id="edit-email" name="edit-email" required>
                     </div>
                     <div class="form-group">
+                        <label for="edit-entreprise">Entreprise</label>
+                        <input type="text" id="edit-entreprise" name="edit-entreprise">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-pays">Pays</label>
+                        <input type="text" id="edit-pays" name="edit-pays">
+                    </div>
+                    <div class="form-group">
                         <label for="edit-age-range">Tranche d'âge *</label>
                         <select id="edit-age-range" name="edit-age-range" required>
                             <option value="">Sélectionnez votre tranche d'âge</option>
@@ -401,6 +432,16 @@
                             <option value="50-55">50-55 ans</option>
                             <option value="55-60">55-60 ans</option>
                             <option value="60+">60 ans et plus</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit-profil-visiteur">Profil visiteur *</label>
+                        <select id="edit-profil-visiteur" name="edit-profil-visiteur" required>
+                            <option value="">Sélectionnez votre profil</option>
+                            <option value="décideur militaire">Décideur militaire</option>
+                            <option value="décideur industriel">Décideur industriel</option>
+                            <option value="opérationnel militaire">Opérationnel militaire</option>
+                            <option value="opérationnel industriel">Opérationnel industriel</option>
                         </select>
                     </div>
                     <div class="form-group">

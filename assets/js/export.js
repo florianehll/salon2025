@@ -46,6 +46,14 @@ const formatAgeRange = (ageRange) => {
     return ageRangeMap[ageRange] || ageRange;
 };
 
+// Fonction utilitaire pour formater le profil visiteur
+const formatProfilVisiteur = (profil) => {
+    if (!profil) return '';
+    
+    // Capitaliser la première lettre de chaque mot
+    return profil.replace(/\b\w/g, l => l.toUpperCase());
+};
+
 // Exporter Excel avec photos (ZIP)
 const exportExcelWithPhotos = async () => {
     try {
@@ -81,7 +89,10 @@ const exportExcelWithPhotos = async () => {
                 Nom: visitor.nom,
                 Prénom: visitor.prenom,
                 Email: visitor.email,
+                Entreprise: visitor.entreprise || '',
+                Pays: visitor.pays || '',
                 'Tranche d\'âge': formatAgeRange(visitor.ageRange),
+                'Profil visiteur': formatProfilVisiteur(visitor.profilVisiteur),
                 'Secteur/Métier': visitor.secteur || '',
                 'Type d\'avion': visitor.aircraftType || '',
                 'Heures de vol': visitor.flightHours || '',
@@ -105,7 +116,10 @@ const exportExcelWithPhotos = async () => {
             { wch: 15 }, // Nom
             { wch: 15 }, // Prénom
             { wch: 30 }, // Email
+            { wch: 25 }, // Entreprise
+            { wch: 15 }, // Pays
             { wch: 15 }, // Tranche d'âge
+            { wch: 20 }, // Profil visiteur
             { wch: 25 }, // Secteur
             { wch: 20 }, // Type d'avion
             { wch: 12 }, // Heures de vol
@@ -161,6 +175,16 @@ const exportExcelWithPhotos = async () => {
         
         statsData.push({ 'Statistique': '', 'Valeur': '' }); // Ligne vide
         
+        // Ajouter les statistiques par profil visiteur
+        Object.entries(stats.profilsVisiteurs).forEach(([profil, count]) => {
+            statsData.push({ 
+                'Statistique': `Profil: ${formatProfilVisiteur(profil)}`, 
+                'Valeur': count 
+            });
+        });
+        
+        statsData.push({ 'Statistique': '', 'Valeur': '' }); // Ligne vide
+        
         // Ajouter les statistiques par secteur
         Object.entries(stats.sectors).forEach(([sector, count]) => {
             statsData.push({ 
@@ -168,6 +192,37 @@ const exportExcelWithPhotos = async () => {
                 'Valeur': count 
             });
         });
+        
+        statsData.push({ 'Statistique': '', 'Valeur': '' }); // Ligne vide
+        
+        // Ajouter les statistiques par entreprise (top 10)
+        const topEntreprises = Object.entries(stats.entreprises)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 10);
+        
+        if (topEntreprises.length > 0) {
+            topEntreprises.forEach(([entreprise, count]) => {
+                statsData.push({ 
+                    'Statistique': `Entreprise: ${entreprise}`, 
+                    'Valeur': count 
+                });
+            });
+            statsData.push({ 'Statistique': '', 'Valeur': '' }); // Ligne vide
+        }
+        
+        // Ajouter les statistiques par pays (top 10)
+        const topPays = Object.entries(stats.pays)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 10);
+        
+        if (topPays.length > 0) {
+            topPays.forEach(([pays, count]) => {
+                statsData.push({ 
+                    'Statistique': `Pays: ${pays}`, 
+                    'Valeur': count 
+                });
+            });
+        }
         
         const statsWs = XLSX.utils.json_to_sheet(statsData);
         statsWs['!cols'] = [{ wch: 30 }, { wch: 15 }];
@@ -194,6 +249,11 @@ Les photos sont nommées selon l'ID du visiteur.
 Le fichier Excel contient deux feuilles:
 1. "Visiteurs ARESIA" : Toutes les données des visiteurs
 2. "Statistiques" : Résumé statistique des données
+
+Nouveaux champs ajoutés:
+- Entreprise : Organisation du visiteur
+- Pays : Pays de résidence
+- Profil visiteur : Décideur/Opérationnel + Militaire/Industriel
 
 Pour toute question, contactez l'équipe ARESIA.`;
         
@@ -372,6 +432,19 @@ const exportWithPhotos = async () => {
             color: #333;
         }
         
+        .profil-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .profil-militaire { background-color: rgba(0, 153, 102, 0.1); color: #009966; }
+        .profil-industriel { background-color: rgba(255, 152, 0, 0.1); color: #ff9800; }
+        .profil-decideur { border: 2px solid currentColor; }
+        
         .ratings { 
             display: flex;
             gap: 1rem;
@@ -499,6 +572,20 @@ const exportWithPhotos = async () => {
         visitors.forEach(visitor => {
             const isPilot = visitor.secteur && visitor.secteur.toLowerCase() === 'pilote';
             
+            // Déterminer les classes CSS pour le profil
+            let profilClasses = 'profil-badge ';
+            if (visitor.profilVisiteur) {
+                if (visitor.profilVisiteur.includes('militaire')) {
+                    profilClasses += 'profil-militaire ';
+                } else if (visitor.profilVisiteur.includes('industriel')) {
+                    profilClasses += 'profil-industriel ';
+                }
+                
+                if (visitor.profilVisiteur.includes('décideur')) {
+                    profilClasses += 'profil-decideur ';
+                }
+            }
+            
             htmlContent += `
     <div class="visitor-card">
         ${visitor.photo 
@@ -514,6 +601,18 @@ const exportWithPhotos = async () => {
                     <div class="info-label">📧 Email</div>
                     <div class="info-value">${visitor.email}</div>
                 </div>
+                ${visitor.entreprise ? `
+                <div class="info-item">
+                    <div class="info-label">🏢 Entreprise</div>
+                    <div class="info-value">${visitor.entreprise}</div>
+                </div>
+                ` : ''}
+                ${visitor.pays ? `
+                <div class="info-item">
+                    <div class="info-label">🌍 Pays</div>
+                    <div class="info-value">${visitor.pays}</div>
+                </div>
+                ` : ''}
                 <div class="info-item">
                     <div class="info-label">🎂 Âge</div>
                     <div class="info-value">${formatAgeRange(visitor.ageRange) || 'Non spécifié'}</div>
@@ -527,6 +626,13 @@ const exportWithPhotos = async () => {
                     <div class="info-value">${new Date(visitor.timestamp).toLocaleString()}</div>
                 </div>
             </div>
+            
+            ${visitor.profilVisiteur ? `
+            <div>
+                <div class="info-label">👤 Profil visiteur</div>
+                <span class="${profilClasses}">${formatProfilVisiteur(visitor.profilVisiteur)}</span>
+            </div>
+            ` : ''}
             
             ${isPilot && (visitor.aircraftType || visitor.flightHours) ? `
             <div class="pilot-info">
@@ -605,7 +711,10 @@ const exportCSV = async () => {
             Nom: visitor.nom,
             Prénom: visitor.prenom,
             Email: visitor.email,
+            Entreprise: visitor.entreprise || '',
+            Pays: visitor.pays || '',
             'Tranche d\'âge': formatAgeRange(visitor.ageRange),
+            'Profil visiteur': formatProfilVisiteur(visitor.profilVisiteur),
             'Secteur/Métier': visitor.secteur || '',
             'Type d\'avion': visitor.aircraftType || '',
             'Heures de vol': visitor.flightHours || '',

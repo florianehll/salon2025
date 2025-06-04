@@ -24,10 +24,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const secteur = document.getElementById('secteur').value.trim();
             const ageRange = document.getElementById('age-range').value;
+            const profilVisiteur = document.getElementById('profil-visiteur').value;
             
             // Validation de la tranche d'âge
             if (!ageRange) {
                 showNotification('Veuillez sélectionner une tranche d\'âge', 'error');
+                return;
+            }
+            
+            // Validation du profil visiteur
+            if (!profilVisiteur) {
+                showNotification('Veuillez sélectionner un profil visiteur', 'error');
                 return;
             }
             
@@ -36,7 +43,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 nom: document.getElementById('nom').value.trim(),
                 prenom: document.getElementById('prenom').value.trim(),
                 email: document.getElementById('email').value.trim(),
+                entreprise: document.getElementById('entreprise').value.trim() || null,
+                pays: document.getElementById('pays').value.trim() || null,
                 ageRange: ageRange,
+                profilVisiteur: profilVisiteur,
                 secteur: secteur,
                 photo: currentPhotoData
             };
@@ -132,11 +142,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             const visitorId = document.getElementById('edit-visitor-id').value;
             const editAgeRange = document.getElementById('edit-age-range').value;
+            const editProfilVisiteur = document.getElementById('edit-profil-visiteur').value;
             const editSecteur = document.getElementById('edit-secteur').value.trim();
             
             // Validation de la tranche d'âge
             if (!editAgeRange) {
                 showNotification('Veuillez sélectionner une tranche d\'âge', 'error');
+                return;
+            }
+            
+            // Validation du profil visiteur
+            if (!editProfilVisiteur) {
+                showNotification('Veuillez sélectionner un profil visiteur', 'error');
                 return;
             }
             
@@ -151,7 +168,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 visitor.nom = document.getElementById('edit-nom').value.trim();
                 visitor.prenom = document.getElementById('edit-prenom').value.trim();
                 visitor.email = document.getElementById('edit-email').value.trim();
+                visitor.entreprise = document.getElementById('edit-entreprise').value.trim() || null;
+                visitor.pays = document.getElementById('edit-pays').value.trim() || null;
                 visitor.ageRange = editAgeRange;
+                visitor.profilVisiteur = editProfilVisiteur;
                 visitor.secteur = editSecteur;
                 
                 if (editPhotoData) {
@@ -264,7 +284,10 @@ const debugVisitorData = async () => {
                 nom: visitor.nom,
                 prenom: visitor.prenom,
                 email: visitor.email,
+                entreprise: visitor.entreprise,
+                pays: visitor.pays,
                 ageRange: visitor.ageRange,
+                profilVisiteur: visitor.profilVisiteur,
                 secteur: visitor.secteur,
                 aircraftType: visitor.aircraftType,
                 flightHours: visitor.flightHours,

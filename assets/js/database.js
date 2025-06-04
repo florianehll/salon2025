@@ -1,6 +1,6 @@
 // Configuration de la base de données
 const DB_NAME = 'AresiaVisitorsDB';
-const DB_VERSION = 3; // Incrémenté pour les nouveaux champs
+const DB_VERSION = 4; // Incrémenté pour les nouveaux champs
 const VISITORS_STORE = 'visitors';
 
 // Base de données IndexedDB
@@ -47,7 +47,7 @@ const initDB = () => {
             }
             
             // Création des index (suppression et recréation pour éviter les conflits)
-            const indexNames = ['email', 'timestamp', 'secteur', 'ageRange'];
+            const indexNames = ['email', 'timestamp', 'secteur', 'ageRange', 'entreprise', 'pays', 'profilVisiteur'];
             
             indexNames.forEach(indexName => {
                 if (store.indexNames.contains(indexName)) {
@@ -60,6 +60,9 @@ const initDB = () => {
             store.createIndex('timestamp', 'timestamp', { unique: false });
             store.createIndex('secteur', 'secteur', { unique: false });
             store.createIndex('ageRange', 'ageRange', { unique: false });
+            store.createIndex('entreprise', 'entreprise', { unique: false });
+            store.createIndex('pays', 'pays', { unique: false });
+            store.createIndex('profilVisiteur', 'profilVisiteur', { unique: false });
             
             console.log('Index de la base de données créés/mis à jour');
             
@@ -83,6 +86,22 @@ const initDB = () => {
                     
                     if (!visitor.flightHours) {
                         visitor.flightHours = null;
+                        needsUpdate = true;
+                    }
+                    
+                    // Ajouter les nouveaux champs v4
+                    if (!visitor.entreprise) {
+                        visitor.entreprise = null;
+                        needsUpdate = true;
+                    }
+                    
+                    if (!visitor.pays) {
+                        visitor.pays = null;
+                        needsUpdate = true;
+                    }
+                    
+                    if (!visitor.profilVisiteur) {
+                        visitor.profilVisiteur = null;
                         needsUpdate = true;
                     }
                     
@@ -122,6 +141,11 @@ const addVisitor = visitor => {
         
         if (!visitor.ageRange) {
             reject("La tranche d'âge est obligatoire");
+            return;
+        }
+        
+        if (!visitor.profilVisiteur) {
+            reject("Le profil visiteur est obligatoire");
             return;
         }
         
@@ -179,6 +203,11 @@ const updateVisitor = visitor => {
         
         if (!visitor.ageRange) {
             reject("La tranche d'âge est obligatoire");
+            return;
+        }
+        
+        if (!visitor.profilVisiteur) {
+            reject("Le profil visiteur est obligatoire");
             return;
         }
         
@@ -326,6 +355,9 @@ const getVisitorStats = () => {
                 pilots: visitors.filter(v => v.secteur && v.secteur.toLowerCase() === 'pilote').length,
                 ageRanges: {},
                 sectors: {},
+                entreprises: {},
+                pays: {},
+                profilsVisiteurs: {},
                 avgRatings: {
                     ergonomie: 0,
                     simulation: 0,
@@ -344,6 +376,27 @@ const getVisitorStats = () => {
             visitors.forEach(visitor => {
                 if (visitor.secteur) {
                     stats.sectors[visitor.secteur] = (stats.sectors[visitor.secteur] || 0) + 1;
+                }
+            });
+            
+            // Statistiques par entreprise
+            visitors.forEach(visitor => {
+                if (visitor.entreprise) {
+                    stats.entreprises[visitor.entreprise] = (stats.entreprises[visitor.entreprise] || 0) + 1;
+                }
+            });
+            
+            // Statistiques par pays
+            visitors.forEach(visitor => {
+                if (visitor.pays) {
+                    stats.pays[visitor.pays] = (stats.pays[visitor.pays] || 0) + 1;
+                }
+            });
+            
+            // Statistiques par profil visiteur
+            visitors.forEach(visitor => {
+                if (visitor.profilVisiteur) {
+                    stats.profilsVisiteurs[visitor.profilVisiteur] = (stats.profilsVisiteurs[visitor.profilVisiteur] || 0) + 1;
                 }
             });
             
@@ -411,6 +464,18 @@ const searchVisitors = (criteria) => {
                     matches = false;
                 }
                 
+                if (criteria.entreprise && !visitor.entreprise.toLowerCase().includes(criteria.entreprise.toLowerCase())) {
+                    matches = false;
+                }
+                
+                if (criteria.pays && !visitor.pays.toLowerCase().includes(criteria.pays.toLowerCase())) {
+                    matches = false;
+                }
+                
+                if (criteria.profilVisiteur && visitor.profilVisiteur !== criteria.profilVisiteur) {
+                    matches = false;
+                }
+                
                 return matches;
             });
             
@@ -446,6 +511,12 @@ const checkDatabaseIntegrity = () => {
                 }
                 if (!visitor.timestamp) {
                     issues.push(`Visiteur ${visitor.visitorId || index}: timestamp manquant`);
+                }
+                if (!visitor.ageRange) {
+                    issues.push(`Visiteur ${visitor.visitorId || index}: tranche d'âge manquante`);
+                }
+                if (!visitor.profilVisiteur) {
+                    issues.push(`Visiteur ${visitor.visitorId || index}: profil visiteur manquant`);
                 }
                 
                 // Vérifier la cohérence des données pilote
