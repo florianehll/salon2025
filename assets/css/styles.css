@@ -583,6 +583,20 @@ footer {
 }
 
 /* ==== RESPONSIVE STYLES ==== */
+@media (max-width: 1200px) {
+    .nav-logo-img {
+        width: 110px; /* Légèrement réduit pour écrans moyens */
+        height: auto;
+    }
+}
+
+@media (max-width: 1024px) {
+    .nav-logo-img {
+        width: 110px; /* Taille intermédiaire pour tablettes */
+        height: auto;
+    }
+}
+
 @media (max-width: 768px) {
     .main-logo {
         width: 180px;
@@ -603,7 +617,7 @@ footer {
     }
     
     .nav-logo-img {
-        width: 70px; /* Réduit sur mobile mais toujours plus grand qu'avant */
+        width: 110px; /* Augmenté de 70px à 80px pour mobile */
         height: auto;
     }
     
