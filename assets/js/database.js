@@ -1,6 +1,6 @@
 // Configuration de la base de données
 const DB_NAME = 'AresiaVisitorsDB';
-const DB_VERSION = 4; // Incrémenté pour les nouveaux champs
+const DB_VERSION = 5; // Incrémenté pour les nouveaux champs
 const VISITORS_STORE = 'visitors';
 
 // Base de données IndexedDB
@@ -47,7 +47,7 @@ const initDB = () => {
             }
             
             // Création des index (suppression et recréation pour éviter les conflits)
-            const indexNames = ['email', 'timestamp', 'secteur', 'ageRange', 'entreprise', 'pays', 'profilVisiteur'];
+            const indexNames = ['email', 'timestamp', 'secteur', 'missionType', 'entreprise', 'pays', 'profilVisiteur'];
             
             indexNames.forEach(indexName => {
                 if (store.indexNames.contains(indexName)) {
@@ -59,7 +59,7 @@ const initDB = () => {
             store.createIndex('email', 'email', { unique: true });
             store.createIndex('timestamp', 'timestamp', { unique: false });
             store.createIndex('secteur', 'secteur', { unique: false });
-            store.createIndex('ageRange', 'ageRange', { unique: false });
+            store.createIndex('missionType', 'missionType', { unique: false });
             store.createIndex('entreprise', 'entreprise', { unique: false });
             store.createIndex('pays', 'pays', { unique: false });
             store.createIndex('profilVisiteur', 'profilVisiteur', { unique: false });
@@ -73,9 +73,15 @@ const initDB = () => {
                     const visitor = cursor.value;
                     let needsUpdate = false;
                     
-                    // Ajouter les nouveaux champs s'ils n'existent pas
-                    if (!visitor.ageRange) {
-                        visitor.ageRange = null;
+                    // Supprimer l'ancien champ ageRange et ajouter missionType
+                    if (visitor.ageRange !== undefined) {
+                        delete visitor.ageRange;
+                        needsUpdate = true;
+                    }
+                    
+                    // Ajouter le nouveau champ missionType s'il n'existe pas
+                    if (!visitor.missionType) {
+                        visitor.missionType = 'AIR - AIR'; // Valeur par défaut
                         needsUpdate = true;
                     }
                     
@@ -139,8 +145,8 @@ const addVisitor = visitor => {
             return;
         }
         
-        if (!visitor.ageRange) {
-            reject("La tranche d'âge est obligatoire");
+        if (!visitor.missionType) {
+            reject("Le type de mission est obligatoire");
             return;
         }
         
@@ -201,8 +207,8 @@ const updateVisitor = visitor => {
             return;
         }
         
-        if (!visitor.ageRange) {
-            reject("La tranche d'âge est obligatoire");
+        if (!visitor.missionType) {
+            reject("Le type de mission est obligatoire");
             return;
         }
         
@@ -353,7 +359,7 @@ const getVisitorStats = () => {
                 withPhotos: visitors.filter(v => v.photo).length,
                 withRatings: visitors.filter(v => v.ergonomie !== undefined || v.simulation !== undefined || v.ressenti !== undefined).length,
                 pilots: visitors.filter(v => v.secteur && v.secteur.toLowerCase() === 'pilote').length,
-                ageRanges: {},
+                missionTypes: {},
                 sectors: {},
                 entreprises: {},
                 pays: {},
@@ -365,10 +371,10 @@ const getVisitorStats = () => {
                 }
             };
             
-            // Statistiques par tranche d'âge
+            // Statistiques par type de mission
             visitors.forEach(visitor => {
-                if (visitor.ageRange) {
-                    stats.ageRanges[visitor.ageRange] = (stats.ageRanges[visitor.ageRange] || 0) + 1;
+                if (visitor.missionType) {
+                    stats.missionTypes[visitor.missionType] = (stats.missionTypes[visitor.missionType] || 0) + 1;
                 }
             });
             
@@ -460,7 +466,7 @@ const searchVisitors = (criteria) => {
                     matches = false;
                 }
                 
-                if (criteria.ageRange && visitor.ageRange !== criteria.ageRange) {
+                if (criteria.missionType && visitor.missionType !== criteria.missionType) {
                     matches = false;
                 }
                 
@@ -512,8 +518,8 @@ const checkDatabaseIntegrity = () => {
                 if (!visitor.timestamp) {
                     issues.push(`Visiteur ${visitor.visitorId || index}: timestamp manquant`);
                 }
-                if (!visitor.ageRange) {
-                    issues.push(`Visiteur ${visitor.visitorId || index}: tranche d'âge manquante`);
+                if (!visitor.missionType) {
+                    issues.push(`Visiteur ${visitor.visitorId || index}: type de mission manquant`);
                 }
                 if (!visitor.profilVisiteur) {
                     issues.push(`Visiteur ${visitor.visitorId || index}: profil visiteur manquant`);

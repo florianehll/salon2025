@@ -7,6 +7,8 @@
     --aresia-gray: #e3e8ee;
     --aresia-green: #00b894;
     --aresia-light-green: #00cec9;
+    --aresia-red: #e74c3c;
+    --aresia-dark-red: #c0392b;
 }
 
 * {
@@ -338,6 +340,15 @@ button:disabled {
 }
 
 .capture-button:hover {
+    box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+}
+
+/* Bouton de suppression */
+.delete-button {
+    background: linear-gradient(135deg, var(--aresia-red) 0%, var(--aresia-dark-red) 100%);
+}
+
+.delete-button:hover {
     box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
 }
 

@@ -317,10 +317,13 @@ const refreshDataTable = async () => {
             }
             row.appendChild(paysCell);
             
-            // Tranche d'âge
-            const ageCell = document.createElement('td');
-            ageCell.textContent = visitor.ageRange || '-';
-            row.appendChild(ageCell);
+            // Type de mission (remplace la tranche d'âge)
+            const missionCell = document.createElement('td');
+            const missionBadge = document.createElement('span');
+            missionBadge.className = 'badge badge-blue';
+            missionBadge.textContent = visitor.missionType || '-';
+            missionCell.appendChild(missionBadge);
+            row.appendChild(missionCell);
             
             // Profil visiteur
             const profilCell = document.createElement('td');
@@ -412,11 +415,29 @@ const refreshDataTable = async () => {
             
             // Actions
             const actionsCell = document.createElement('td');
+            
+            // Bouton modifier
             const editButton = document.createElement('button');
             editButton.className = 'edit-button';
             editButton.innerHTML = isMobile ? '<span>✏️</span>' : '<span>✏️</span> Modifier';
             editButton.addEventListener('click', () => openEditModal(visitor));
+            editButton.style.marginRight = '0.5rem';
             actionsCell.appendChild(editButton);
+            
+            // Bouton supprimer
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-button';
+            deleteButton.style.background = 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)';
+            deleteButton.innerHTML = isMobile ? '<span>🗑️</span>' : '<span>🗑️</span> Supprimer';
+            deleteButton.addEventListener('click', async () => {
+                const visitorName = `${visitor.nom} ${visitor.prenom}`;
+                const confirmed = await confirmDeleteVisitor(visitor.visitorId, visitorName);
+                if (confirmed) {
+                    // La suppression est gérée dans confirmDeleteVisitor
+                }
+            });
+            actionsCell.appendChild(deleteButton);
+            
             row.appendChild(actionsCell);
             
             tableBody.appendChild(row);
@@ -440,7 +461,7 @@ const openEditModal = async (visitor) => {
     document.getElementById('edit-email').value = visitor.email;
     document.getElementById('edit-entreprise').value = visitor.entreprise || '';
     document.getElementById('edit-pays').value = visitor.pays || '';
-    document.getElementById('edit-age-range').value = visitor.ageRange || '';
+    document.getElementById('edit-mission-type').value = visitor.missionType || '';
     document.getElementById('edit-profil-visiteur').value = visitor.profilVisiteur || '';
     document.getElementById('edit-secteur').value = visitor.secteur || '';
     

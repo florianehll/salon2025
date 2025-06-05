@@ -23,12 +23,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.preventDefault();
             
             const secteur = document.getElementById('secteur').value.trim();
-            const ageRange = document.getElementById('age-range').value;
+            const missionType = document.getElementById('mission-type').value;
             const profilVisiteur = document.getElementById('profil-visiteur').value;
             
-            // Validation de la tranche d'âge
-            if (!ageRange) {
-                showNotification('Veuillez sélectionner une tranche d\'âge', 'error');
+            // Validation du type de mission
+            if (!missionType) {
+                showNotification('Veuillez sélectionner un type de mission', 'error');
                 return;
             }
             
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 email: document.getElementById('email').value.trim(),
                 entreprise: document.getElementById('entreprise').value.trim() || null,
                 pays: document.getElementById('pays').value.trim() || null,
-                ageRange: ageRange,
+                missionType: missionType,
                 profilVisiteur: profilVisiteur,
                 secteur: secteur,
                 photo: currentPhotoData
@@ -141,13 +141,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.preventDefault();
             
             const visitorId = document.getElementById('edit-visitor-id').value;
-            const editAgeRange = document.getElementById('edit-age-range').value;
+            const editMissionType = document.getElementById('edit-mission-type').value;
             const editProfilVisiteur = document.getElementById('edit-profil-visiteur').value;
             const editSecteur = document.getElementById('edit-secteur').value.trim();
             
-            // Validation de la tranche d'âge
-            if (!editAgeRange) {
-                showNotification('Veuillez sélectionner une tranche d\'âge', 'error');
+            // Validation du type de mission
+            if (!editMissionType) {
+                showNotification('Veuillez sélectionner un type de mission', 'error');
                 return;
             }
             
@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 visitor.email = document.getElementById('edit-email').value.trim();
                 visitor.entreprise = document.getElementById('edit-entreprise').value.trim() || null;
                 visitor.pays = document.getElementById('edit-pays').value.trim() || null;
-                visitor.ageRange = editAgeRange;
+                visitor.missionType = editMissionType;
                 visitor.profilVisiteur = editProfilVisiteur;
                 visitor.secteur = editSecteur;
                 
@@ -208,11 +208,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (event.key === 'Escape') {
                 const cameraModal = document.getElementById('camera-modal');
                 const editModal = document.getElementById('edit-modal');
+                const deleteModal = document.getElementById('delete-modal');
                 
                 if (cameraModal.style.display === 'flex') {
                     closeCameraModal();
                 } else if (editModal.style.display === 'flex') {
                     closeEditModal();
+                } else if (deleteModal && deleteModal.style.display === 'flex') {
+                    closeDeleteModal();
                 }
             }
             
@@ -271,6 +274,84 @@ window.addEventListener('unhandledrejection', (event) => {
     event.preventDefault();
 });
 
+// Fonction pour confirmer et supprimer un visiteur
+const confirmDeleteVisitor = async (visitorId, visitorName) => {
+    return new Promise((resolve) => {
+        // Créer le modal de confirmation
+        const deleteModal = document.createElement('div');
+        deleteModal.id = 'delete-modal';
+        deleteModal.className = 'modal';
+        deleteModal.style.display = 'flex';
+        
+        deleteModal.innerHTML = `
+            <div class="modal-content" style="max-width: 500px;">
+                <div class="modal-header">
+                    <h3>Confirmer la suppression</h3>
+                    <button class="close-button" onclick="closeDeleteModal()">&times;</button>
+                </div>
+                <div style="padding: 1rem 0;">
+                    <div style="text-align: center; margin-bottom: 1.5rem;">
+                        <div style="font-size: 3rem; color: #e74c3c; margin-bottom: 1rem;">⚠️</div>
+                        <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">Êtes-vous sûr de vouloir supprimer ce visiteur ?</p>
+                        <p style="font-weight: bold; color: var(--aresia-navy);">${visitorName}</p>
+                        <p style="color: #666; font-size: 0.9rem; margin-top: 1rem;">
+                            Cette action est irréversible. Toutes les données associées seront définitivement perdues.
+                        </p>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button id="confirm-delete-btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);">
+                            <span>🗑️</span> Supprimer définitivement
+                        </button>
+                        <button id="cancel-delete-btn" style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);">
+                            <span>❌</span> Annuler
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(deleteModal);
+        
+        // Gestionnaires d'événements
+        document.getElementById('confirm-delete-btn').addEventListener('click', async () => {
+            try {
+                await deleteVisitor(visitorId);
+                closeDeleteModal();
+                showNotification('Visiteur supprimé avec succès', 'success');
+                refreshDataTable();
+                refreshVisitorSelect();
+                refreshVisitorCount();
+                resolve(true);
+            } catch (error) {
+                showNotification(`Erreur lors de la suppression: ${error}`, 'error');
+                resolve(false);
+            }
+        });
+        
+        document.getElementById('cancel-delete-btn').addEventListener('click', () => {
+            closeDeleteModal();
+            resolve(false);
+        });
+        
+        // Fermer avec Escape
+        const handleEscape = (event) => {
+            if (event.key === 'Escape') {
+                closeDeleteModal();
+                resolve(false);
+            }
+        };
+        
+        document.addEventListener('keydown', handleEscape);
+        
+        // Fonction pour fermer le modal
+        window.closeDeleteModal = () => {
+            deleteModal.remove();
+            document.removeEventListener('keydown', handleEscape);
+            delete window.closeDeleteModal;
+        };
+    });
+};
+
 // Fonction utilitaire pour déboguer les données
 const debugVisitorData = async () => {
     try {
@@ -286,7 +367,7 @@ const debugVisitorData = async () => {
                 email: visitor.email,
                 entreprise: visitor.entreprise,
                 pays: visitor.pays,
-                ageRange: visitor.ageRange,
+                missionType: visitor.missionType,
                 profilVisiteur: visitor.profilVisiteur,
                 secteur: visitor.secteur,
                 aircraftType: visitor.aircraftType,

@@ -26,24 +26,10 @@ const formatFlightHours = (hours) => {
     return `${hours}h`;
 };
 
-// Fonction utilitaire pour formater la tranche d'âge
-const formatAgeRange = (ageRange) => {
-    if (!ageRange) return '';
-    
-    const ageRangeMap = {
-        '-20': 'Moins de 20 ans',
-        '20-25': '20-25 ans',
-        '25-30': '25-30 ans',
-        '30-35': '30-35 ans',
-        '35-40': '35-40 ans',
-        '40-45': '40-45 ans',
-        '45-50': '45-50 ans',
-        '50-55': '50-55 ans',
-        '55-60': '55-60 ans',
-        '60+': '60 ans et plus'
-    };
-    
-    return ageRangeMap[ageRange] || ageRange;
+// Fonction utilitaire pour formater le type de mission
+const formatMissionType = (missionType) => {
+    if (!missionType) return '';
+    return missionType;
 };
 
 // Fonction utilitaire pour formater le profil visiteur
@@ -91,7 +77,7 @@ const exportExcelWithPhotos = async () => {
                 Email: visitor.email,
                 Entreprise: visitor.entreprise || '',
                 Pays: visitor.pays || '',
-                'Tranche d\'âge': formatAgeRange(visitor.ageRange),
+                'Type de mission': formatMissionType(visitor.missionType),
                 'Profil visiteur': formatProfilVisiteur(visitor.profilVisiteur),
                 'Secteur/Métier': visitor.secteur || '',
                 'Type d\'avion': visitor.aircraftType || '',
@@ -118,7 +104,7 @@ const exportExcelWithPhotos = async () => {
             { wch: 30 }, // Email
             { wch: 25 }, // Entreprise
             { wch: 15 }, // Pays
-            { wch: 15 }, // Tranche d'âge
+            { wch: 15 }, // Type de mission
             { wch: 20 }, // Profil visiteur
             { wch: 25 }, // Secteur
             { wch: 20 }, // Type d'avion
@@ -165,10 +151,10 @@ const exportExcelWithPhotos = async () => {
             { 'Statistique': '', 'Valeur': '' }, // Ligne vide
         ];
         
-        // Ajouter les statistiques par tranche d'âge
-        Object.entries(stats.ageRanges).forEach(([ageRange, count]) => {
+        // Ajouter les statistiques par type de mission
+        Object.entries(stats.missionTypes).forEach(([missionType, count]) => {
             statsData.push({ 
-                'Statistique': `Âge: ${formatAgeRange(ageRange)}`, 
+                'Statistique': `Mission: ${formatMissionType(missionType)}`, 
                 'Valeur': count 
             });
         });
@@ -253,6 +239,7 @@ Le fichier Excel contient deux feuilles:
 Nouveaux champs ajoutés:
 - Entreprise : Organisation du visiteur
 - Pays : Pays de résidence
+- Type de mission : AIR - AIR ou AIR - GROUND
 - Profil visiteur : Décideur/Opérationnel + Militaire/Industriel
 
 Pour toute question, contactez l'équipe ARESIA.`;
@@ -445,6 +432,17 @@ const exportWithPhotos = async () => {
         .profil-industriel { background-color: rgba(255, 152, 0, 0.1); color: #ff9800; }
         .profil-decideur { border: 2px solid currentColor; }
         
+        .mission-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            background-color: rgba(0, 102, 204, 0.1);
+            color: #0066cc;
+        }
+        
         .ratings { 
             display: flex;
             gap: 1rem;
@@ -614,8 +612,8 @@ const exportWithPhotos = async () => {
                 </div>
                 ` : ''}
                 <div class="info-item">
-                    <div class="info-label">🎂 Âge</div>
-                    <div class="info-value">${formatAgeRange(visitor.ageRange) || 'Non spécifié'}</div>
+                    <div class="info-label">🎯 Type de mission</div>
+                    <div class="info-value">${formatMissionType(visitor.missionType) || 'Non spécifié'}</div>
                 </div>
                 <div class="info-item">
                     <div class="info-label">💼 Secteur</div>
@@ -631,6 +629,13 @@ const exportWithPhotos = async () => {
             <div>
                 <div class="info-label">👤 Profil visiteur</div>
                 <span class="${profilClasses}">${formatProfilVisiteur(visitor.profilVisiteur)}</span>
+            </div>
+            ` : ''}
+            
+            ${visitor.missionType ? `
+            <div>
+                <div class="info-label">🎯 Mission</div>
+                <span class="mission-badge">${formatMissionType(visitor.missionType)}</span>
             </div>
             ` : ''}
             
@@ -713,7 +718,7 @@ const exportCSV = async () => {
             Email: visitor.email,
             Entreprise: visitor.entreprise || '',
             Pays: visitor.pays || '',
-            'Tranche d\'âge': formatAgeRange(visitor.ageRange),
+            'Type de mission': formatMissionType(visitor.missionType),
             'Profil visiteur': formatProfilVisiteur(visitor.profilVisiteur),
             'Secteur/Métier': visitor.secteur || '',
             'Type d\'avion': visitor.aircraftType || '',
